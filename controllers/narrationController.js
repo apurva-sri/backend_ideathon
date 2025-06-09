@@ -14,9 +14,14 @@ const axiosInstance = axios.create({
 // ✅ Start narration
 export const startNarration = async (req, res) => {
   const { camera_ip } = req.body;
-  console.log(camera_ip);
-  if (!camera_ip) {
-    return res.status(400).json({ error: 'Camera IP is required.' });
+  console.log('🎥 Received camera_ip:', camera_ip);
+
+  // Validate: must be a non-empty valid-looking URL or IP
+  const isValidUrl = /^https?:\/\/.+/i.test(camera_ip) || /^\d{1,3}(\.\d{1,3}){3}(:\d+)?(\/\w+)*$/.test(camera_ip);
+  if (!camera_ip || !isValidUrl) {
+    return res.status(400).json({
+      error: 'Invalid or missing camera IP. Must be a valid IP or stream URL (e.g., http://ip:port/video).',
+    });
   }
 
   try {
@@ -37,6 +42,7 @@ export const startNarration = async (req, res) => {
     });
   }
 };
+
 
 // ✅ Stop narration
 export const stopNarration = async (req, res) => {
